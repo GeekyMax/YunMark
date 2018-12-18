@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.bootcss.com/github-markdown-css/2.10.0/github-markdown.css" rel="stylesheet">
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/tomorrow.min.css">-->
+    <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/github.min.css">-->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/styles/atom-one-light.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.13.1/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+</head>
+<body class="markdown-body">
+<h1>这是标题</h1>
+<h2>Hackpad</h2>
+<p><strong>Hackpad</strong> 是个开源的基于网页的实时 wiki，基于开源 EtherPad 协作文档编辑器。</p>
+<pre><code>int main;
+</code></pre>
+<pre><code class="language-java">package com.geekymax;
+
+import org.commonmark.node.*;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        File file = new File(&quot;C:/Code/我的文档库/我的文档/test.md&quot;);
+        try {
+
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            Scanner scanner = new Scanner(bufferedReader);
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line).append(&quot;\n&quot;);
+            }
+            Parser parser = Parser.builder().build();
+            Node document = parser.parse(stringBuilder.toString());
+            HtmlRenderer renderer = HtmlRenderer.builder().build();
+            String result = renderer.render(document);
+            System.out.println(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+}
+
+</code></pre>
+<p>| 表格1 | 表格2 | 表格3 |
+    | ----- | ----- | ----- |
+    | 1     | 2     | 3     |
+    | 4     | 5     | 6     |
+    | 7     | 8     | 9     |</p>
+<p>Hackpad 允许用户实时分享你的文档，它还用彩色编码显示各个作者分别贡献了哪部分。它还允许插入图片、清单，由于提供了语法高亮功能，它还能用来写代码。</p>
+<p>当2014年4月 Dropbox 收购了 Hackpad 后，就在这个月这款软件以开源的形式发布。让我们经历的等待非常值得。</p>
+<p>特性：</p>
+<ol>
+    <li>有类似 wiki 所提供的，一套非常完善的功能</li>
+    <li>实时或者异步地记录协作笔记，共享数据和文件，或用评论分享你们的想法</li>
+    <li>细致的隐私许可让你可以邀请单个朋友、一个十几人的团队或者上千的 Twitter 粉丝</li>
+    <li>智能执行</li>
+    <li>直接从流行的视频分享网站上插入视频</li>
+    <li>表格</li>
+    <li>可对使用广泛的包括 C, C#, CSS, CoffeeScript, Java, 以及 HTML 在内的编程语言进行语法高亮</li>
+</ol>
+<p>网站：hackpad.com</p>
+<p>源代码：github.com/dropbox/hackpad</p>
+<p>开发者：Contributors</p>
+<p>许可：Apache License, Version 2.0</p>
+<p>版本号： -</p>
+
+
+Process finished with exit code 0
+
+</body>
+</html>
