@@ -1,4 +1,4 @@
-package com.geekymax.gui;
+package com.geekymax.client.gui;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +15,7 @@ public final class MainFrame {
      * Creates the main window and makes it visible.
      */
     public MainFrame() {
-        Dimension frameSize = new Dimension(1280, 900);
+        Dimension frameSize = new Dimension(600, 400);
 
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setSize(frameSize);

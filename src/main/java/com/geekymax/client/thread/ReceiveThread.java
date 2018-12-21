@@ -1,17 +1,26 @@
-package com.geekymax.thread;
+package com.geekymax.client.thread;
+
+import com.geekymax.Document;
+import com.geekymax.client.ClientDocument;
+import com.geekymax.operation.Operation;
 
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+
 
 /**
  * @author Max Huang
  */
 public class ReceiveThread implements Runnable {
     private Socket socket;
+    private ClientDocument document;
 
     public ReceiveThread(Socket socket) {
         this.socket = socket;
+        this.document = ClientDocument.getInstance();
     }
 
     @Override
@@ -19,13 +28,12 @@ public class ReceiveThread implements Runnable {
         try {
             // 建立好连接后，从socket中获取输入流，并建立缓冲区进行读取
             InputStream inputStream = socket.getInputStream();
-            byte[] bytes = new byte[1024];
-            int len;
             //只有当客户端关闭它的输出流的时候，服务端才能取得结尾的-1
-            while ((len = inputStream.read(bytes)) != -1) {
-                // 注意指定编码格式，发送方和接收方一定要统一，建议使用UTF-8
-                String text = new String(bytes, 0, len, StandardCharsets.UTF_8);
-                System.out.println("receive:" + text);
+            while (true) {
+                ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+                Operation operation = (Operation) objectInputStream.readObject();
+                System.out.println("receive:" + operation);
+                document.receiveOperation(operation);
             }
         } catch (Exception e) {
             e.printStackTrace();

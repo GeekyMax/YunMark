@@ -1,4 +1,4 @@
-package com.geekymax.gui;
+package com.geekymax.client.gui;
 
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
@@ -8,7 +8,6 @@ import javax.swing.*;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 import java.io.File;
-import java.io.FileFilter;
 import java.util.Observable;
 import java.util.Observer;
 

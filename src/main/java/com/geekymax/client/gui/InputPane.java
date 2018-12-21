@@ -1,36 +1,39 @@
-package com.geekymax.gui;
+package com.geekymax.client.gui;
 
 
-import com.geekymax.thread.ReceiveThread;
-import com.geekymax.thread.SendThread;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
+import com.geekymax.Document;
+import com.geekymax.client.ClientDocument;
+import com.geekymax.client.thread.ReceiveThread;
+import com.geekymax.client.thread.SendThread;
+import com.geekymax.operation.Operation;
+import com.geekymax.ot.Changes;
+import com.geekymax.ot.Delete;
+import com.geekymax.ot.Insert;
+import com.geekymax.ot.Retain;
 
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.lang.reflect.Field;
 import java.net.Socket;
 import java.util.Observable;
 import java.util.concurrent.*;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.GapContent;
-import javax.swing.text.Segment;
-import javax.swing.undo.CompoundEdit;
-
 
 /**
  * @author Max Huang
  */
 public final class InputPane extends Observable {
     private final JScrollPane inputPane = new JScrollPane();
-    private final JTextArea inputTextArea = new JTextArea();
-    private static String previousText;
+    private static final JTextArea inputTextArea = new JTextArea();
     private final Object lock;
     private SendThread sendThread;
     private ReceiveThread receiveThread;
+
+    public static synchronized JTextArea getInputTextArea() {
+        return inputTextArea;
+    }
 
     /**
      * Creates the text area and add a key listener to call observer every time a key is released.
@@ -38,6 +41,7 @@ public final class InputPane extends Observable {
     public InputPane() {
         lock = new Object();
         inputPane.getViewport().add(inputTextArea, null);
+        ClientDocument.getInstance().setInputTextArea(inputTextArea);
         inputTextArea.setFont(new Font("微软雅黑", Font.PLAIN, 16));
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
         try {
@@ -51,7 +55,6 @@ public final class InputPane extends Observable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         inputTextArea.addKeyListener(new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -59,7 +62,6 @@ public final class InputPane extends Observable {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                previousText = inputTextArea.getText();
                 setChanged();
                 notifyObservers(inputTextArea.getText());
             }
@@ -85,28 +87,25 @@ public final class InputPane extends Observable {
             }
 
             protected void changeFilter(DocumentEvent event) {
+                if (ClientDocument.getInstance().isUpdating()) {
+                    System.out.println("is updating");
+                    return;
+                }
                 javax.swing.text.Document document = event.getDocument();
                 try {
-                    String type;
-                    if (event.getType() == DocumentEvent.EventType.INSERT) {
-                        type = "ins";
-                    } else if (event.getType() == DocumentEvent.EventType.REMOVE) {
-                        type = "del";
-                    } else {
-                        type = "upd";
-                    }
-                    int offset = event.getOffset();
-                    int length = event.getLength();
-                    String content;
-                    if (event.getType() == DocumentEvent.EventType.REMOVE) {
-                        content = previousText.substring(offset, offset + length);
-                    } else {
-                        content = document.getText(event.getOffset(), event.getLength());
-                    }
-                    String operation = type + "[" + offset + "," + "\"" + content + "\"]";
                     synchronized (lock) {
-                        System.out.println(operation);
-                        sendThread.setText(operation);
+                        int offset = event.getOffset();
+                        int length = event.getLength();
+                        Changes changes;
+                        if (event.getType() == DocumentEvent.EventType.INSERT) {
+                            changes = new Changes(new Retain(offset), new Insert(document.getText(event.getOffset(), event.getLength())));
+                        } else {
+                            changes = new Changes(new Retain(offset), new Delete(length));
+                        }
+                        System.out.println("input: " + changes);
+                        Operation operation = new Operation(0, ClientDocument.getInstance().getVersion(), changes);
+                        ClientDocument.getInstance().handleSelfOperation(operation);
+                        sendThread.setChanges(changes);
                         lock.notify();
                     }
                 } catch (Exception ex) {
@@ -124,4 +123,5 @@ public final class InputPane extends Observable {
     public JScrollPane get() {
         return inputPane;
     }
+
 }

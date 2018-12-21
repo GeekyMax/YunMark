@@ -1,4 +1,4 @@
-package com.geekymax.gui;
+package com.geekymax.client.gui;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

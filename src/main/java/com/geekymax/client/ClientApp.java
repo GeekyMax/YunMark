@@ -1,18 +1,15 @@
-package com.geekymax;
+package com.geekymax.client;
 
-import com.geekymax.console.ArgsParser;
-import com.geekymax.console.ConsoleMode;
-import com.geekymax.console.DisplayUsageException;
-import com.geekymax.gui.MainFrame;
+
+import com.geekymax.client.gui.MainFrame;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.FileNotFoundException;
 
 /**
  * @author Max Huang
  */
-public class App {
+public class ClientApp {
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             @Override
