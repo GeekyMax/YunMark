@@ -1,7 +1,9 @@
 package com.geekymax.client;
 
 import com.geekymax.Document;
+import com.geekymax.client.gui.InputPane;
 import com.geekymax.operation.Operation;
+import com.geekymax.ot.Changes;
 import com.geekymax.ot.Text;
 
 import javax.swing.*;
@@ -13,10 +15,12 @@ import java.util.Vector;
 public class ClientDocument {
     private static ClientDocument document;
     private Vector<Operation> operationVector;
-    private Object lock;
+    private final Object lock;
     private Text text;
-    private JTextArea inputTextArea;
+    private InputPane inputPane;
     private boolean isUpdating;
+    private JTextArea inputTextArea;
+
     static {
         document = new ClientDocument();
     }
@@ -26,6 +30,7 @@ public class ClientDocument {
         this.lock = new Object();
         text = Text.empty();
         isUpdating = false;
+        inputTextArea = InputPane.getInputTextArea();
     }
 
     public void handleSelfOperation(Operation operation) throws Exception {
@@ -37,11 +42,15 @@ public class ClientDocument {
 
     public void receiveOperation(Operation operation) throws Exception {
         synchronized (lock) {
+            int nowCaretDot = inputTextArea.getCaret().getDot();
+            int newCaretDot = operation.getTextChange().calculateCaret(nowCaretDot);
             operation.getTextChange().apply(0, text);
             operationVector.add(operation);
-            isUpdating=true;
+            isUpdating = true;
             inputTextArea.setText(text.toString());
-            isUpdating=false;
+            inputTextArea.getCaret().setDot(newCaretDot);
+            inputPane.updatePreview();
+            isUpdating = false;
         }
 
     }
@@ -54,8 +63,8 @@ public class ClientDocument {
         return operationVector.size();
     }
 
-    public void setInputTextArea(JTextArea inputTextArea) {
-        this.inputTextArea = inputTextArea;
+    public void setInputPane(InputPane inputPane) {
+        this.inputPane = inputPane;
     }
 
     public boolean isUpdating() {

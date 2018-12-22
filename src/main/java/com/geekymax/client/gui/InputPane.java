@@ -20,6 +20,8 @@ import java.awt.event.KeyListener;
 import java.net.Socket;
 import java.util.Observable;
 import java.util.concurrent.*;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Max Huang
@@ -27,7 +29,9 @@ import java.util.concurrent.*;
 public final class InputPane extends Observable {
     private final JScrollPane inputPane = new JScrollPane();
     private static final JTextArea inputTextArea = new JTextArea();
-    private final Object lock;
+    private ReentrantLock inputReentrantLock;
+    private ReentrantLock sendThreadReentrantlock;
+    private Condition sendThreadCondition;
     private SendThread sendThread;
     private ReceiveThread receiveThread;
 
@@ -39,14 +43,16 @@ public final class InputPane extends Observable {
      * Creates the text area and add a key listener to call observer every time a key is released.
      */
     public InputPane() {
-        lock = new Object();
+        sendThreadReentrantlock = new ReentrantLock();
+        sendThreadCondition = sendThreadReentrantlock.newCondition();
+        inputReentrantLock = new ReentrantLock();
         inputPane.getViewport().add(inputTextArea, null);
-        ClientDocument.getInstance().setInputTextArea(inputTextArea);
-        inputTextArea.setFont(new Font("微软雅黑", Font.PLAIN, 16));
+        ClientDocument.getInstance().setInputPane(this);
+        inputTextArea.setFont(new Font("微软雅黑", Font.PLAIN, 14));
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
         try {
             Socket socket = new Socket("127.0.0.1", 9999);
-            sendThread = new SendThread(socket, lock);
+            sendThread = new SendThread(socket, sendThreadReentrantlock, sendThreadCondition);
             receiveThread = new ReceiveThread(socket);
             ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(2, 4, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(2), threadFactory);
             threadPoolExecutor.execute(sendThread);
@@ -62,8 +68,7 @@ public final class InputPane extends Observable {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                setChanged();
-                notifyObservers(inputTextArea.getText());
+                updatePreview();
             }
 
             @Override
@@ -86,29 +91,30 @@ public final class InputPane extends Observable {
                 changeFilter(e);
             }
 
-            protected void changeFilter(DocumentEvent event) {
+            protected synchronized void changeFilter(DocumentEvent event) {
                 if (ClientDocument.getInstance().isUpdating()) {
                     System.out.println("is updating");
                     return;
                 }
                 javax.swing.text.Document document = event.getDocument();
                 try {
-                    synchronized (lock) {
-                        int offset = event.getOffset();
-                        int length = event.getLength();
-                        Changes changes;
-                        if (event.getType() == DocumentEvent.EventType.INSERT) {
-                            changes = new Changes(new Retain(offset), new Insert(document.getText(event.getOffset(), event.getLength())));
-                        } else {
-                            changes = new Changes(new Retain(offset), new Delete(length));
-                        }
-                        System.out.println("input: " + changes);
-                        Operation operation = new Operation(0, ClientDocument.getInstance().getVersion(), changes);
-                        ClientDocument.getInstance().handleSelfOperation(operation);
-                        sendThread.setChanges(changes);
-                        lock.notify();
+                    int offset = event.getOffset();
+                    int length = event.getLength();
+                    Changes changes;
+                    if (event.getType() == DocumentEvent.EventType.INSERT) {
+                        changes = new Changes(new Retain(offset), new Insert(document.getText(event.getOffset(), event.getLength())));
+                    } else {
+                        changes = new Changes(new Retain(offset), new Delete(length));
                     }
-                } catch (Exception ex) {
+                    System.out.println("input: " + changes);
+                    Operation operation = new Operation(0, ClientDocument.getInstance().getVersion(), changes);
+                    ClientDocument.getInstance().handleSelfOperation(operation);
+                    sendThreadReentrantlock.lock();
+                    sendThread.setChanges(changes);
+                    sendThreadCondition.signal();
+                    sendThreadReentrantlock.unlock();
+                } catch (
+                        Exception ex) {
                     ex.printStackTrace();
                 }
             }
@@ -123,5 +129,11 @@ public final class InputPane extends Observable {
     public JScrollPane get() {
         return inputPane;
     }
+
+    public synchronized void updatePreview() {
+        setChanged();
+        notifyObservers(inputTextArea.getText());
+    }
+
 
 }

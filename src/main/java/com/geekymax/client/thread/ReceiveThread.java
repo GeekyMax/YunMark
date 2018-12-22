@@ -2,8 +2,10 @@ package com.geekymax.client.thread;
 
 import com.geekymax.Document;
 import com.geekymax.client.ClientDocument;
+import com.geekymax.client.gui.InputPane;
 import com.geekymax.operation.Operation;
 
+import javax.naming.ldap.PagedResultsControl;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -17,7 +19,6 @@ import java.nio.charset.StandardCharsets;
 public class ReceiveThread implements Runnable {
     private Socket socket;
     private ClientDocument document;
-
     public ReceiveThread(Socket socket) {
         this.socket = socket;
         this.document = ClientDocument.getInstance();

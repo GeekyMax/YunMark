@@ -8,6 +8,8 @@ import java.io.*;
 import java.net.Socket;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Max Huang
@@ -16,9 +18,11 @@ public class SendThread implements Runnable {
     private Socket socket;
     private ClientDocument document;
     private final Object lock;
-    private Changes changes;
+    private ReentrantLock sendThreadReentrantLock;
+    private Condition sendThreadCondition;
+    private volatile Changes changes;
     private boolean endLoop = false;
-    private Queue<Changes> changesQueue = new LinkedList<>();
+    private volatile Queue<Changes> changesQueue = new LinkedList<>();
 
     public SendThread(Socket socket, Object lock) {
         this.socket = socket;
@@ -26,6 +30,14 @@ public class SendThread implements Runnable {
         this.document = ClientDocument.getInstance();
     }
 
+    public SendThread(Socket socket, ReentrantLock sendThreadReentrantLock, Condition sendThreadCondition) {
+        this.lock = new Object();
+        this.socket = socket;
+        this.sendThreadReentrantLock = sendThreadReentrantLock;
+        this.sendThreadCondition = sendThreadCondition;
+        this.document = ClientDocument.getInstance();
+
+    }
 
     public synchronized void setChanges(Changes changes) {
         changesQueue.offer(changes);
@@ -41,23 +53,25 @@ public class SendThread implements Runnable {
     public void run() {
         try {
             while (!endLoop) {
-
-                ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                synchronized (lock) {
-                    lock.wait();
-                    int index = 0;
-                    while (!changesQueue.isEmpty()) {
-                        if (index != 0) {
-                            System.out.println("wow,something happened");
-                        }
-                        System.out.println("send:" + changes);
-                        Changes c = changesQueue.poll();
-                        Operation operation = new Operation(0, document.getVersion(), c);
-                        objectOutputStream.writeObject(operation);
-                        objectOutputStream.flush();
-                        index++;
-                    }
+                sendThreadReentrantLock.lock();
+                sendThreadCondition.await();
+                int index = 0;
+                if (changesQueue.size() > 1) {
+                    System.out.print("");
                 }
+                while (!changesQueue.isEmpty()) {
+                    ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+                    if (index != 0) {
+                        System.out.println("wow,something happened");
+                    }
+                    Changes c = changesQueue.poll();
+                    Operation operation = new Operation(0, document.getVersion(), c);
+                    objectOutputStream.writeObject(operation);
+                    objectOutputStream.flush();
+                    System.out.println("send:" + c);
+                    index++;
+                }
+                sendThreadReentrantLock.unlock();
             }
         } catch (Exception e) {
             e.printStackTrace();
