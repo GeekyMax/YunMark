@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+/**
+ * 目录树结点信息
+ * @author Max Huang
+ */
 public class CatalogueNodeInfo {
     private int level;
     private int lineNumber;

@@ -1,8 +1,14 @@
 package com.geekymax.client.gui;
 
+import com.geekymax.client.service.OutputService;
+import com.geekymax.util.FileUtil;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Observable;
 
 /**
@@ -42,15 +48,48 @@ public final class MenuBar extends Observable {
     private JMenu createFileMenu() {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic('F');
+        JMenuItem open = new JMenuItem();
+        open.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
+            }
+        });
+        JMenuItem outputMarkdown = new JMenuItem("output as markdown");
+        JMenuItem outputHtml = new JMenuItem("output as HTML");
+        outputMarkdown.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setSelectedFile(new File("C:/file.md"));
+                fileChooser.showSaveDialog(null);
+                File file = fileChooser.getSelectedFile();
+                OutputService.getInstance().outputAsMarkdown(file);
+            }
+        });
+        outputHtml.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setSelectedFile(new File("C:/file.html"));
+                fileChooser.showSaveDialog(null);
+                File file = fileChooser.getSelectedFile();
+                OutputService.getInstance().outputAsHtml(file);
+            }
+        });
         JMenuItem exit = new JMenuItem("Exit");
         exit.setMnemonic('x');
         exit.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
             }
         });
-
+        JMenu output = new JMenu("output");
+        output.add(outputMarkdown);
+        output.add(outputHtml);
+        fileMenu.add(open);
+        fileMenu.add(output);
         fileMenu.add(exit);
         return fileMenu;
     }
