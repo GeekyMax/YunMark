@@ -12,12 +12,12 @@ public final class MainPanel {
             // Layout constraints
             "",
             // Column constraints
-            "[fill,50%] 10 [fill,50%]",
+            "[fill,20%] 10 [fill, 40%] 10 [fill,40%]",
             // Row constraints
             "[grow,fill]");
     private final JPanel mainPanel = new JPanel(layout);
 
-    private final InputPane input = new InputPane();
+    private final InputPane input = InputPane.getInstance();
     private final PreviewPane preview = new PreviewPane();
 
     /**
@@ -28,6 +28,7 @@ public final class MainPanel {
         input.addObserver(preview);
 
         // Build GUI
+        mainPanel.add(CataloguePane.getInstance().get());
         mainPanel.add(input.get());
         mainPanel.add(preview.get());
     }

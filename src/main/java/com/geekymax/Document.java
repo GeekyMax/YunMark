@@ -24,7 +24,7 @@ public class Document {
     }
 
     private Document() {
-        this.text = Text.empty();
+        this.text = Text.wrap("This is the text in the server");
 //        this.version = 0;
         this.operationVector = new Vector<>();
         this.lock = new Object();
@@ -90,5 +90,9 @@ public class Document {
 
     public void setText(Text text) {
         this.text = text;
+    }
+
+    public Text getText() {
+        return text;
     }
 }

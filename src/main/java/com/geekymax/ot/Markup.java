@@ -1,9 +1,11 @@
 package com.geekymax.ot;
 
+import java.io.Serializable;
+
 /**
  * Created by Stas on 3/21/16.
  */
-abstract class Markup extends Change {
+abstract class Markup extends Change implements Serializable {
     @Override
     int offset() {
         return 0;

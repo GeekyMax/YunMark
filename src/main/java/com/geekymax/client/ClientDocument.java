@@ -70,4 +70,18 @@ public class ClientDocument {
     public boolean isUpdating() {
         return isUpdating;
     }
+
+    public void setText(Text text) {
+        synchronized (lock) {
+            this.text = text;
+            isUpdating = true;
+            inputTextArea.setText(text.toString());
+            inputTextArea.getCaret().setDot(text.toString().length());
+            isUpdating = false;
+        }
+    }
+
+    public String getText() {
+        return text.toString();
+    }
 }

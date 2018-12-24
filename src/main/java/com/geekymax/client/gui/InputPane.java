@@ -1,7 +1,6 @@
 package com.geekymax.client.gui;
 
 
-import com.geekymax.Document;
 import com.geekymax.client.ClientDocument;
 import com.geekymax.client.thread.ReceiveThread;
 import com.geekymax.client.thread.SendThread;
@@ -27,26 +26,33 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Max Huang
  */
 public final class InputPane extends Observable {
-    private final JScrollPane inputPane = new JScrollPane();
+    private final JScrollPane scrollPane = new JScrollPane();
     private static final JTextArea inputTextArea = new JTextArea();
-    private ReentrantLock inputReentrantLock;
     private ReentrantLock sendThreadReentrantlock;
     private Condition sendThreadCondition;
     private SendThread sendThread;
     private ReceiveThread receiveThread;
+    private static InputPane inputPane;
+
+    static {
+        inputPane = new InputPane();
+    }
 
     public static synchronized JTextArea getInputTextArea() {
         return inputTextArea;
     }
 
+    public static InputPane getInstance() {
+        return inputPane;
+    }
+
     /**
      * Creates the text area and add a key listener to call observer every time a key is released.
      */
-    public InputPane() {
+    private InputPane() {
         sendThreadReentrantlock = new ReentrantLock();
         sendThreadCondition = sendThreadReentrantlock.newCondition();
-        inputReentrantLock = new ReentrantLock();
-        inputPane.getViewport().add(inputTextArea, null);
+        scrollPane.getViewport().add(inputTextArea, null);
         ClientDocument.getInstance().setInputPane(this);
         inputTextArea.setFont(new Font("微软雅黑", Font.PLAIN, 14));
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
@@ -92,9 +98,17 @@ public final class InputPane extends Observable {
             }
 
             protected synchronized void changeFilter(DocumentEvent event) {
+
                 if (ClientDocument.getInstance().isUpdating()) {
                     System.out.println("is updating");
                     return;
+                }
+                // todo 未解决的一个NullPointerException
+                try {
+                    CataloguePane.getInstance().updateTree(event.getDocument().getText(0, event.getDocument().getLength()));
+                } catch (Exception e) {
+                    System.out.println("error here3");
+                    e.printStackTrace();
                 }
                 javax.swing.text.Document document = event.getDocument();
                 try {
@@ -127,7 +141,7 @@ public final class InputPane extends Observable {
      * @return the JScrollPane object.
      */
     public JScrollPane get() {
-        return inputPane;
+        return scrollPane;
     }
 
     public synchronized void updatePreview() {

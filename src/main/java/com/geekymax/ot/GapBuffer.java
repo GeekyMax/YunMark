@@ -1,10 +1,11 @@
 package com.geekymax.ot;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import static java.lang.System.arraycopy;
 
-class GapBuffer implements CharSequence {
+class GapBuffer implements CharSequence, Serializable {
     protected static final int DEFAULT_GAP_SIZE = 16;
 
     protected int gapSize = DEFAULT_GAP_SIZE;

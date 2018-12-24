@@ -3,13 +3,14 @@ package com.geekymax.ot;
 import com.google.common.collect.Ordering;
 import com.google.common.collect.TreeMultimap;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Map;
 
 /**
- * Created by Stas on 3/12/16.
+ * @author Max Huang
  */
-public class Text {
+public class Text implements Serializable {
     final GapBuffer buffer;
     final TreeMultimap<Integer, Markup> markup = TreeMultimap.create(Ordering.natural(), Ordering.from(
             Comparator.comparing(m -> m.getClass().getName(), Ordering.natural().reversed())

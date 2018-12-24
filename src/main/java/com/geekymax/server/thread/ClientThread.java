@@ -33,6 +33,9 @@ public class ClientThread implements Runnable {
             System.out.println("client " + index + " is online!");
             // 建立好连接后，从socket中获取输入流，并建立缓冲区进行读取
             InputStream inputStream = socket.getInputStream();
+            OutputStream outputStream = socket.getOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            objectOutputStream.writeObject(document.getText().toString());
             while (true) {
                 ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
                 Operation operation = (Operation) objectInputStream.readObject();
