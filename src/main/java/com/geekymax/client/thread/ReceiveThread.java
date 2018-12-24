@@ -1,18 +1,13 @@
 package com.geekymax.client.thread;
 
-import com.geekymax.Document;
-import com.geekymax.client.ClientDocument;
+import com.geekymax.client.ClientDocumentService;
 import com.geekymax.client.gui.CataloguePane;
-import com.geekymax.client.gui.InputPane;
 import com.geekymax.operation.Operation;
 import com.geekymax.ot.Text;
 
-import javax.naming.ldap.PagedResultsControl;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -20,11 +15,11 @@ import java.nio.charset.StandardCharsets;
  */
 public class ReceiveThread implements Runnable {
     private Socket socket;
-    private ClientDocument document;
+    private ClientDocumentService document;
 
     public ReceiveThread(Socket socket) {
         this.socket = socket;
-        this.document = ClientDocument.getInstance();
+        this.document = ClientDocumentService.getInstance();
     }
 
     @Override

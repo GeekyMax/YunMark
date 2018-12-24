@@ -95,7 +95,7 @@ public class DiffUtils {
     }
 
 
-    private static Change convert(Diff diff) {
+    private static AbstractChange convert(Diff diff) {
         switch (diff.operation) {
             case DELETE:
                 return new Delete(diff.text.length());

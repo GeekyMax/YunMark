@@ -6,7 +6,9 @@ import java.io.Serializable;
 import static com.geekymax.ot.Transform.transformMarkupAgainstInsert;
 
 /**
- * Created by Stas on 3/12/16.
+ * Change的实现类,表示一个Insert的操作
+ * @author Stas
+ * @date 3/12/16
  */
 public class Insert extends TextChange implements Serializable {
     final String text;

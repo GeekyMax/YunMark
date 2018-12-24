@@ -14,8 +14,7 @@ import java.util.Observable;
 /**
  * Provides the menu bar of the application.
  *
- * @author Nilhcem
- * @since 1.0
+ * @author Max Huang
  */
 public final class MenuBar extends Observable {
     private final JMenuBar menuBar = new JMenuBar();
@@ -48,6 +47,7 @@ public final class MenuBar extends Observable {
     private JMenu createFileMenu() {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic('F');
+        // todo 打开本地文件功能
         JMenuItem open = new JMenuItem();
         open.addActionListener(new ActionListener() {
             @Override
@@ -55,6 +55,7 @@ public final class MenuBar extends Observable {
 
             }
         });
+        // 文件输出功能
         JMenuItem outputMarkdown = new JMenuItem("output as markdown");
         JMenuItem outputHtml = new JMenuItem("output as HTML");
         outputMarkdown.addActionListener(new ActionListener() {
@@ -77,6 +78,7 @@ public final class MenuBar extends Observable {
                 OutputService.getInstance().outputAsHtml(file);
             }
         });
+        // 退出应用程序
         JMenuItem exit = new JMenuItem("Exit");
         exit.setMnemonic('x');
         exit.addActionListener(new ActionListener() {

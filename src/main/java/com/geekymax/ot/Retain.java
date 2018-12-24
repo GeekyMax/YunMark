@@ -3,7 +3,9 @@ package com.geekymax.ot;
 import java.io.Serializable;
 
 /**
- * Created by Stas on 3/12/16.
+ * Change一个实现类, 表示一个移动光标操作
+ * @author Stas
+ * @date 3/12/16
  */
 public class Retain extends TextChange implements Serializable {
     private final int length;

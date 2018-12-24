@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by Stas on 3/21/16.
  */
-abstract class Markup extends Change implements Serializable {
+abstract class Markup extends AbstractChange implements Serializable {
     @Override
     int offset() {
         return 0;

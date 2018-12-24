@@ -40,7 +40,7 @@ public class Text implements Serializable {
         return new Text(new GapBuffer(original.buffer.toString()));
     }
 
-    public Text apply(Change change) throws ValidationException {
+    public Text apply(AbstractChange change) throws ValidationException {
         return change.apply(0, this);
     }
 

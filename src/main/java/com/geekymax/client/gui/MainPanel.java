@@ -17,18 +17,18 @@ public final class MainPanel {
             "[grow,fill]");
     private final JPanel mainPanel = new JPanel(layout);
 
-    private final InputPane input = InputPane.getInstance();
-    private final PreviewPane preview = new PreviewPane();
-
     /**
      * Creates the main panel, adding observer to the input and building the GUI.
      */
     public MainPanel() {
         // Add observer
-        input.addObserver(preview);
 
         // Build GUI
-        mainPanel.add(CataloguePane.getInstance().get());
+        InputPane input = InputPane.getInstance();
+        PreviewPane preview = PreviewPane.getInstance();
+        CataloguePane cataloguePane = CataloguePane.getInstance();
+        input.addObserver(preview);
+        mainPanel.add(cataloguePane.get());
         mainPanel.add(input.get());
         mainPanel.add(preview.get());
     }

@@ -7,22 +7,25 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by Stas on 3/12/16.
+ * AbstractChanged的实现类,是多个Change的集合
+ *
+ * @author Max Huang
+ * @author Stas
  */
-public class Changes extends Change implements Serializable {
-    final List<Change> changes;
+public class Changes extends AbstractChange implements Serializable {
+    final List<AbstractChange> changes;
 
-    public Changes(Change... changes) {
+    public Changes(AbstractChange... changes) {
         this(Arrays.asList(changes));
     }
 
-    public Changes(Iterable<Change> changes) {
+    public Changes(Iterable<AbstractChange> changes) {
         this.changes = Lists.newArrayList(changes);
     }
 
     @Override
     public Text apply(int pos, Text text) throws ValidationException {
-        for (Change change : changes) {
+        for (AbstractChange change : changes) {
             change.apply(pos, text);
             pos += change.offset();
         }
@@ -32,7 +35,7 @@ public class Changes extends Change implements Serializable {
     @Override
     public int offset() {
         int pos = 0;
-        for (Change change : changes) {
+        for (AbstractChange change : changes) {
             pos += change.offset();
         }
         return pos;
@@ -42,7 +45,7 @@ public class Changes extends Change implements Serializable {
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         int pos = 0;
-        for (Change c : changes) {
+        for (AbstractChange c : changes) {
             if (c instanceof Retain) {
                 pos = Integer.parseInt(c.toString());
             } else if (c instanceof Insert) {
@@ -57,7 +60,7 @@ public class Changes extends Change implements Serializable {
     public int calculateCaret(int oldCaret) {
         int nowPosition = 0;
         int nowCaret = oldCaret;
-        for (Change c : changes) {
+        for (AbstractChange c : changes) {
             if (c instanceof Retain) {
                 nowPosition += c.offset();
             } else if (c instanceof Insert) {

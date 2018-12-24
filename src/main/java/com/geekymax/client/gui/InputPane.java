@@ -1,7 +1,7 @@
 package com.geekymax.client.gui;
 
 
-import com.geekymax.client.ClientDocument;
+import com.geekymax.client.ClientDocumentService;
 import com.geekymax.client.thread.ReceiveThread;
 import com.geekymax.client.thread.SendThread;
 import com.geekymax.operation.Operation;
@@ -13,6 +13,7 @@ import com.geekymax.ot.Retain;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -53,7 +54,7 @@ public final class InputPane extends Observable {
         sendThreadReentrantlock = new ReentrantLock();
         sendThreadCondition = sendThreadReentrantlock.newCondition();
         scrollPane.getViewport().add(inputTextArea, null);
-        ClientDocument.getInstance().setInputPane(this);
+        ClientDocumentService.getInstance().setInputPane(this);
         inputTextArea.setFont(new Font("微软雅黑", Font.PLAIN, 14));
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
         try {
@@ -97,9 +98,13 @@ public final class InputPane extends Observable {
                 changeFilter(e);
             }
 
-            protected synchronized void changeFilter(DocumentEvent event) {
+            /**
+             * 处理文档变更事件,构造operation,改变Text,并发送给服务器端
+             * @param event Document Event
+             */
+            private synchronized void changeFilter(DocumentEvent event) {
 
-                if (ClientDocument.getInstance().isUpdating()) {
+                if (ClientDocumentService.getInstance().isUpdating()) {
                     System.out.println("is updating");
                     return;
                 }
@@ -107,13 +112,15 @@ public final class InputPane extends Observable {
                 try {
                     CataloguePane.getInstance().updateTree(event.getDocument().getText(0, event.getDocument().getLength()));
                 } catch (Exception e) {
-                    System.out.println("error here3");
+                    System.out.println("error here");
                     e.printStackTrace();
                 }
-                javax.swing.text.Document document = event.getDocument();
+                // get the document object of the textArea
+                Document document = event.getDocument();
                 try {
                     int offset = event.getOffset();
                     int length = event.getLength();
+                    // build the changes
                     Changes changes;
                     if (event.getType() == DocumentEvent.EventType.INSERT) {
                         changes = new Changes(new Retain(offset), new Insert(document.getText(event.getOffset(), event.getLength())));
@@ -121,12 +128,11 @@ public final class InputPane extends Observable {
                         changes = new Changes(new Retain(offset), new Delete(length));
                     }
                     System.out.println("input: " + changes);
-                    Operation operation = new Operation(0, ClientDocument.getInstance().getVersion(), changes);
-                    ClientDocument.getInstance().handleSelfOperation(operation);
                     sendThreadReentrantlock.lock();
-                    sendThread.setChanges(changes);
+                    Operation operation = sendThread.addOperation(changes);
                     sendThreadCondition.signal();
                     sendThreadReentrantlock.unlock();
+                    ClientDocumentService.getInstance().handleSelfOperation(operation);
                 } catch (
                         Exception ex) {
                     ex.printStackTrace();

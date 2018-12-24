@@ -7,11 +7,22 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
+ * 一个操作的基本单位,包括客户端编号,版本信息与变更信息
+ *
  * @author Max Huang
  */
 public class Operation implements Serializable {
+    /**
+     * 客户端编号
+     */
     private int clientIndex;
+    /**
+     * 操作基于的文档版本
+     */
     private int version;
+    /**
+     * 文档变更
+     */
     private Changes textChange;
 
     public Operation(int clientIndex, int version, Changes textChange) {

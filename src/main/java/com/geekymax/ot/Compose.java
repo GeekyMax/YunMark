@@ -7,19 +7,21 @@ import java.util.ListIterator;
 import static java.lang.Math.max;
 
 /**
- * Created by Stas on 3/21/16.
+ *
+ * @author Stas
+ * @date 3/21/16
  */
 public class Compose {
     private Compose() {
     }
 
     public static Changes compose(Changes l, Changes r) {
-        ListIterator<Change> i = new ArrayList<>(l.changes).listIterator();
-        ListIterator<Change> j = new ArrayList<>(r.changes).listIterator();
-        List<Change> result = new ArrayList<>(max(l.changes.size(), r.changes.size()));
+        ListIterator<AbstractChange> i = new ArrayList<>(l.changes).listIterator();
+        ListIterator<AbstractChange> j = new ArrayList<>(r.changes).listIterator();
+        List<AbstractChange> result = new ArrayList<>(max(l.changes.size(), r.changes.size()));
         while (i.hasNext() && j.hasNext()) {
-            Change ch1 = i.next();
-            Change ch2 = j.next();
+            AbstractChange ch1 = i.next();
+            AbstractChange ch2 = j.next();
             if (ch1 instanceof Retain) {
                 if (ch2 instanceof Retain) {
                     if (ch1.offset() == ch2.offset()) {

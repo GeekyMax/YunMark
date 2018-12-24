@@ -17,6 +17,8 @@ import java.util.regex.Pattern;
 import static java.util.regex.Pattern.*;
 
 /**
+ * 目录树视图面板(单例
+ *
  * @author Max Huang
  */
 public class CataloguePane {
@@ -43,19 +45,16 @@ public class CataloguePane {
         catalogueTree.setCellRenderer(render);
         // 设置根节点可见
         catalogueTree.setRootVisible(true);
-        catalogueTree.addTreeSelectionListener(new TreeSelectionListener() {
-            @Override
-            public void valueChanged(TreeSelectionEvent e) {
+        catalogueTree.addTreeSelectionListener(e -> {
 
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) catalogueTree.getLastSelectedPathComponent();
-                if (node == null) {
-                    return;
-                }
-                CatalogueNodeInfo nodeInfo = (CatalogueNodeInfo) node.getUserObject();
-                JScrollPane scrollPane = InputPane.getInstance().get();
-                JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
-                scrollBar.setValue(16 * nodeInfo.getLineNumber());
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) catalogueTree.getLastSelectedPathComponent();
+            if (node == null) {
+                return;
             }
+            CatalogueNodeInfo nodeInfo = (CatalogueNodeInfo) node.getUserObject();
+            JScrollPane scrollPane = InputPane.getInstance().get();
+            JScrollBar scrollBar = scrollPane.getVerticalScrollBar();
+            scrollBar.setValue(16 * nodeInfo.getLineNumber());
         });
         scrollPane.getViewport().add(catalogueTree);
     }
@@ -120,6 +119,13 @@ public class CataloguePane {
         }
     }
 
+    /**
+     * 展开整颗目录树
+     *
+     * @param tree   JTree对象
+     * @param parent 父节点路径
+     * @param expand 是否是展开
+     */
     private static void expandAll(JTree tree, TreePath parent, boolean expand) {
         TreeNode node = (TreeNode) parent.getLastPathComponent();
         if (node.getChildCount() >= 0) {

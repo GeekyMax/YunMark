@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Queue;
 
 /**
- * 向各个客户端广播operation
+ * 向各个客户端广播operation的线程
  *
  * @author Max Huang
  */
@@ -18,7 +18,6 @@ public class BroadcastThread implements Runnable {
     private List<ClientThread> clientThreadList;
     private static BroadcastThread instance;
     private int excludeIndex;
-    private Operation operation;
     private Queue<Operation> operationQueue = new LinkedList<>();
 
     static {
@@ -30,9 +29,6 @@ public class BroadcastThread implements Runnable {
         this.excludeIndex = excludeIndex;
     }
 
-    public synchronized Object getBroadcastLock() {
-        return broadcastLock;
-    }
 
     public BroadcastThread init(Object broadcastLock, List<ClientThread> clientThreadList) {
         this.broadcastLock = broadcastLock;
@@ -50,13 +46,14 @@ public class BroadcastThread implements Runnable {
     @Override
     public void run() {
         System.out.println("b running");
+        // xxx 需要提供退出可能
         while (true) {
             try {
                 synchronized (broadcastLock) {
                     broadcastLock.wait();
-                    int index=0;
+                    int index = 0;
                     while (!operationQueue.isEmpty()) {
-                        if (index!=0){
+                        if (index != 0) {
                             System.out.println("wow,something happened");
                         }
                         Operation o = operationQueue.poll();
@@ -85,13 +82,9 @@ public class BroadcastThread implements Runnable {
         }
     }
 
-    public void setOperation(Operation operation) {
+    public void addOperation(Operation operation) {
         System.out.println("set operation:" + operation);
-        this.operation = operation;
         operationQueue.offer(operation);
     }
 
-    public void deleteSocket(int index) {
-
-    }
 }

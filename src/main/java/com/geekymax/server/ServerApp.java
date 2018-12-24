@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
+ * 服务器程序启动入口
  * @author Max Huang
  */
 public class ServerApp {

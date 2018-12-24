@@ -6,7 +6,9 @@ import java.io.Serializable;
 import static com.geekymax.ot.Transform.transformMarkupAgainstDelete;
 
 /**
- * Created by Stas on 3/12/16.
+ * Change的实现类,表示一个删除操作
+ * @author Stas
+ * @date 3/12/16
  */
 public class Delete extends TextChange implements Serializable {
     final int len;

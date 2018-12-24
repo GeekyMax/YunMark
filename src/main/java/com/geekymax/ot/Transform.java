@@ -7,7 +7,9 @@ import java.util.*;
 import static com.google.common.collect.Lists.newArrayList;
 
 /**
- * Created by Stas on 3/15/16.
+ *
+ * @author Stas
+ * @date 3/15/16
  */
 public class Transform {
     private Transform() {
@@ -76,8 +78,8 @@ public class Transform {
     public static Result transform(Changes chs1, Changes chs2) {
         ResultBuilder builder = new ResultBuilder(chs1.changes, chs2.changes);
         while (builder.hasNext()) {
-            Change ch1 = builder.left();
-            Change ch2 = builder.right();
+            AbstractChange ch1 = builder.left();
+            AbstractChange ch2 = builder.right();
             if (ch1 instanceof Retain) {
                 if (ch2 instanceof Retain) {
                     transform((Retain) ch1, (Retain) ch2, builder);
@@ -131,13 +133,13 @@ public class Transform {
 
     @SuppressWarnings("unchecked")
     private static class ResultBuilder {
-        private ListIterator<Change> leftIterator;
-        private ListIterator<Change> rightIterator;
-        private List<Change> leftRes;
-        private List<Change> rightRes;
+        private ListIterator<AbstractChange> leftIterator;
+        private ListIterator<AbstractChange> rightIterator;
+        private List<AbstractChange> leftRes;
+        private List<AbstractChange> rightRes;
         boolean flipped = false;
 
-        public ResultBuilder(List<Change> l, List<Change> r) {
+        public ResultBuilder(List<AbstractChange> l, List<AbstractChange> r) {
             this.leftIterator = new ArrayList<>(l).listIterator();
             this.rightIterator = new ArrayList<>(r).listIterator();
             this.leftRes = new ArrayList<>(l.size());
@@ -148,28 +150,28 @@ public class Transform {
             return leftIterator.hasNext() && rightIterator.hasNext();
         }
 
-        Change left() {
+        AbstractChange left() {
             return leftIterator.next();
         }
 
-        Change right() {
+        AbstractChange right() {
             return rightIterator.next();
         }
 
-        void addLeft(Change c) {
+        void addLeft(AbstractChange c) {
             leftRes.add(c);
         }
 
-        void addRight(Change c) {
+        void addRight(AbstractChange c) {
             rightRes.add(c);
         }
 
-        void replaceLeft(Change c) {
+        void replaceLeft(AbstractChange c) {
             leftIterator.set(c);
             leftIterator.previous();
         }
 
-        void replaceRight(Change c) {
+        void replaceRight(AbstractChange c) {
             rightIterator.set(c);
             rightIterator.previous();
         }
@@ -177,11 +179,11 @@ public class Transform {
         ResultBuilder flip() {
             flipped = !flipped;
 
-            List<Change> b = this.leftRes;
+            List<AbstractChange> b = this.leftRes;
             this.leftRes = this.rightRes;
             this.rightRes = b;
 
-            ListIterator<Change> i = this.leftIterator;
+            ListIterator<AbstractChange> i = this.leftIterator;
             this.leftIterator = this.rightIterator;
             this.rightIterator = i;
 
@@ -203,16 +205,16 @@ public class Transform {
         private final Changes changes1;
         private final Changes changes2;
 
-        public Result(List<Change> changes1, List<Change> changes2) {
+        public Result(List<AbstractChange> changes1, List<AbstractChange> changes2) {
             this.changes1 = new Changes(changes1);
             this.changes2 = new Changes(changes2);
         }
 
-        public Change getLeft() {
+        public AbstractChange getLeft() {
             return changes1;
         }
 
-        public Change getRight() {
+        public AbstractChange getRight() {
             return changes2;
         }
     }

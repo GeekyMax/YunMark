@@ -1,7 +1,7 @@
 package com.geekymax.server.thread;
 
 
-import com.geekymax.Document;
+import com.geekymax.ServerDocumentService;
 import com.geekymax.operation.Operation;
 
 import java.io.*;
@@ -16,14 +16,13 @@ import java.net.Socket;
 public class ClientThread implements Runnable {
     private Socket socket;
     private int index;
-    private Document document;
-    private ObjectOutputStream objectOutputStream;
-    private Object broadcastLock;
+    private ServerDocumentService serverDocumentService;
+    private final Object broadcastLock;
 
     public ClientThread(Socket socket, int index, Object broadcastLock) {
         this.socket = socket;
         this.index = index;
-        document = Document.getInstance();
+        serverDocumentService = ServerDocumentService.getInstance();
         this.broadcastLock = broadcastLock;
     }
 
@@ -35,7 +34,7 @@ public class ClientThread implements Runnable {
             InputStream inputStream = socket.getInputStream();
             OutputStream outputStream = socket.getOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-            objectOutputStream.writeObject(document.getText().toString());
+            objectOutputStream.writeObject(serverDocumentService.getText().toString());
             while (true) {
                 ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
                 Operation operation = (Operation) objectInputStream.readObject();
@@ -43,10 +42,11 @@ public class ClientThread implements Runnable {
                 if (operation == null) {
                     break;
                 }
+                operation = serverDocumentService.receiveOperation(operation);
                 // 消息广播
                 BroadcastThread broadcastThread = BroadcastThread.getInstance();
                 synchronized (broadcastLock) {
-                    broadcastThread.setOperation(operation);
+                    broadcastThread.addOperation(operation);
                     broadcastThread.setExcludeIndex(index);
                     broadcastLock.notify();
                 }
@@ -72,7 +72,4 @@ public class ClientThread implements Runnable {
         return socket;
     }
 
-    public ObjectOutputStream getObjectOutputStream() {
-        return objectOutputStream;
-    }
 }

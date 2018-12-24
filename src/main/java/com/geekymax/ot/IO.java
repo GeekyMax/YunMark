@@ -15,13 +15,13 @@ public class IO {
     private IO() {
     }
 
-    public static Change fromString(String str) {
+    public static AbstractChange fromString(String str) {
         String[] split = StringUtils.splitPreserveAllTokens(str, '|');
         if (split.length != 2) {
             throw new IllegalArgumentException("Wrong format, expected 3 blocks separated by '|', but was: " + str);
         }
 
-        List<Change> res = new ArrayList<>();
+        List<AbstractChange> res = new ArrayList<>();
         String stream = split[0];
         String inserts = unescape(split[1]);
         StringBuilder num = new StringBuilder();
@@ -52,7 +52,7 @@ public class IO {
         return new Changes(res);
     }
 
-    public static String toString(Change ch) {
+    public static String toString(AbstractChange ch) {
         return ch instanceof Changes
                 ? toString((Changes) ch)
                 : toString(new Changes(ch));
@@ -60,7 +60,7 @@ public class IO {
 
     public static String toDebugString(Changes ch) {
         StringBuilder stream = new StringBuilder();
-        for (Change each : ch.changes) {
+        for (AbstractChange each : ch.changes) {
             if (each instanceof Retain) {
                 stream.append(repeat("=", each.offset()));
             } else if (each instanceof Delete) {
@@ -75,7 +75,7 @@ public class IO {
     static String toString(Changes ch) {
         StringBuilder insert = new StringBuilder();
         StringBuilder stream = new StringBuilder();
-        for (Change each : ch.changes) {
+        for (AbstractChange each : ch.changes) {
             if (each instanceof Retain) {
                 stream.append("=").append(each.offset());
             } else if (each instanceof Delete) {

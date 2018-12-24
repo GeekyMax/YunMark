@@ -1,5 +1,6 @@
 package com.geekymax.client.gui;
 
+import com.geekymax.util.FileUtil;
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;
 import org.commonmark.renderer.html.HtmlRenderer;
@@ -12,17 +13,25 @@ import java.util.Observable;
 import java.util.Observer;
 
 /**
+ * 预览面板
+ * xxx Observer 已过时, 改用javafx
+ *
  * @author Max Huang
  */
 public final class PreviewPane implements Observer {
     private final JScrollPane previewPane = new JScrollPane();
     private JEditorPane jEditorPane = new JEditorPane();
     private final String template = "<body class=\"markdown-body\">%s</body></html>";
+    private static PreviewPane instance = new PreviewPane();
+
+    public static PreviewPane getInstance() {
+        return instance;
+    }
 
     /**
      * Creates the HTML JLabel and sets its vertical alignment as in the top.
      */
-    public PreviewPane() {
+    private PreviewPane() {
         jEditorPane.setContentType("text/html");
         jEditorPane.setEditable(false);
         jEditorPane.setContentType("text/html");
@@ -31,9 +40,7 @@ public final class PreviewPane implements Observer {
         jEditorPane.setEditorKit(kit);
         try {
             StyleSheet styleSheet = kit.getStyleSheet();
-            File file = new File("C:/Code/mycode/assets/github-markdown.css");
-//            File file = new File("C:/Code/mycode/assets/github.css");
-//            File file = new File("C:\\Program Files\\Typora\\resources\\app\\style\\themes\\github.css");
+            File file = new File(FileUtil.getAbsolutePath("/assets/github-markdown.css"));
             styleSheet.importStyleSheet(file.toURI().toURL());
             kit.setStyleSheet(styleSheet);
             jEditorPane.setEditorKit(kit);
@@ -64,15 +71,12 @@ public final class PreviewPane implements Observer {
     @Override
     public void update(final Observable o, final Object data) {
         if (o instanceof InputPane) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    String content = (String) data;
-                    Parser parser = Parser.builder().build();
-                    Node document = parser.parse(content);
-                    HtmlRenderer renderer = HtmlRenderer.builder().build();
-                    jEditorPane.setText(String.format(template, renderer.render(document)).replaceAll("src=\"", "src=\"file:"));
-                }
+            SwingUtilities.invokeLater(() -> {
+                String content = (String) data;
+                Parser parser = Parser.builder().build();
+                Node document = parser.parse(content);
+                HtmlRenderer renderer = HtmlRenderer.builder().build();
+                jEditorPane.setText(String.format(template, renderer.render(document)).replaceAll("src=\"", "src=\"file:"));
             });
         }
     }

@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * 目录树结点信息
+ *
  * @author Max Huang
  */
 public class CatalogueNodeInfo {
