@@ -15,7 +15,7 @@ public class ClientApp {
         EventQueue.invokeLater(() -> {
             // fixme 修改
             System.setProperty("apple.laf.useScreenMenuBar", "true");
-            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Markdown editor");
+            System.setProperty("com.apple.mrj.application.apple.menu.about.name", "YunMark 多人协作");
             UIManager.put("swing.boldMetal", Boolean.FALSE);
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

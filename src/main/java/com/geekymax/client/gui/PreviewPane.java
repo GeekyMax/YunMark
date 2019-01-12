@@ -14,7 +14,7 @@ import java.util.Observer;
 
 /**
  * 预览面板
- * xxx Observer 已过时, 改用javafx
+ * xxx Observer 已过时, 改用javafx中的observable
  *
  * @author Max Huang
  */

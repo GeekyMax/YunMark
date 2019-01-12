@@ -1,4 +1,4 @@
-package com.geekymax;
+package com.geekymax.server;
 
 import com.geekymax.ot.*;
 import com.geekymax.operation.Operation;
@@ -23,7 +23,7 @@ public class ServerDocumentService {
     }
 
     private ServerDocumentService() {
-        this.text = Text.wrap("This is the text in the server");
+        this.text = Text.empty();
         this.operationVector = new Vector<>();
     }
 
@@ -39,7 +39,7 @@ public class ServerDocumentService {
     /**
      * call me when receive a new operation from the client
      * @param operation the received operation
-     * @return the
+     * @return the operation
      * @throws Exception
      */
     public synchronized Operation receiveOperation(Operation operation) throws Exception {

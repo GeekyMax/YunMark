@@ -17,8 +17,10 @@ public class ServerApp {
     public static Object broadcastLock = new Object();
 
     public static void main(String[] args) {
+        // 存储连接上的客户端线程
         List<ClientThread> clientThreadList = new ArrayList<>();
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
+        // 使用线程池
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(5, 10, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(10), threadFactory);
         BroadcastThread broadcastThread = BroadcastThread.getInstance().init(broadcastLock,clientThreadList);
         threadPoolExecutor.execute(broadcastThread);
@@ -26,6 +28,7 @@ public class ServerApp {
             try {
                 ServerSocket serverSocket = new ServerSocket(9999);
                 int index = 0;
+                //循环等待每一个客户端的链接
                 while (true) {
                     System.out.println("waiting!");
                     Socket socket = serverSocket.accept();

@@ -56,8 +56,10 @@ public class BroadcastThread implements Runnable {
                         if (index != 0) {
                             System.out.println("wow,something happened");
                         }
+                        // 从操作队列中取出,然后广播
                         Operation o = operationQueue.poll();
                         System.out.println("broadcast: " + o);
+                        // 广播消息
                         clientThreadList.forEach(clientThread -> {
                             if (clientThread.getIndex() != excludeIndex) {
                                 Socket socket = clientThread.getSocket();

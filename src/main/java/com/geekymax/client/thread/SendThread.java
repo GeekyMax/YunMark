@@ -12,25 +12,18 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * this is a thread which sends message to the server
  * @author Max Huang
  */
 public class SendThread implements Runnable {
     private Socket socket;
     private ClientDocumentService document;
-    private final Object lock;
     private ReentrantLock sendThreadReentrantLock;
     private Condition sendThreadCondition;
     private boolean endLoop = false;
     private volatile Queue<Operation> operationQueue = new LinkedList<>();
 
-    public SendThread(Socket socket, Object lock) {
-        this.socket = socket;
-        this.lock = lock;
-        this.document = ClientDocumentService.getInstance();
-    }
-
     public SendThread(Socket socket, ReentrantLock sendThreadReentrantLock, Condition sendThreadCondition) {
-        this.lock = new Object();
         this.socket = socket;
         this.sendThreadReentrantLock = sendThreadReentrantLock;
         this.sendThreadCondition = sendThreadCondition;

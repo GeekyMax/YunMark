@@ -32,11 +32,26 @@ public class ClientDocumentService {
         inputTextArea = InputPane.getInputTextArea();
     }
 
+
+    public static ClientDocumentService getInstance() {
+        return document;
+    }
+
+    /**
+     * called when this client has a new operation
+     * @param operation
+     * @throws Exception
+     */
     public synchronized void handleSelfOperation(Operation operation) throws Exception {
         operation.getTextChange().apply(0, text);
         operationVector.add(operation);
     }
 
+    /**
+     * receive the operation and update the local text and refresh the pane
+     * @param operation
+     * @throws Exception
+     */
     public synchronized void receiveOperation(Operation operation) throws Exception {
         int nowCaretDot = inputTextArea.getCaret().getDot();
         int newCaretDot = operation.getTextChange().calculateCaret(nowCaretDot);
@@ -48,10 +63,6 @@ public class ClientDocumentService {
         inputPane.updatePreview();
         isUpdating = false;
 
-    }
-
-    public static ClientDocumentService getInstance() {
-        return document;
     }
 
     public int getVersion() {

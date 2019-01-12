@@ -11,15 +11,16 @@ import java.net.Socket;
 
 
 /**
+ * this is a thread which receive the message from server
  * @author Max Huang
  */
 public class ReceiveThread implements Runnable {
     private Socket socket;
-    private ClientDocumentService document;
+    private ClientDocumentService clientDocumentService;
 
     public ReceiveThread(Socket socket) {
         this.socket = socket;
-        this.document = ClientDocumentService.getInstance();
+        this.clientDocumentService = ClientDocumentService.getInstance();
     }
 
     @Override
@@ -34,18 +35,20 @@ public class ReceiveThread implements Runnable {
                 if (object instanceof Operation) {
                     Operation operation = (Operation) object;
                     System.out.println("receive:" + operation);
-                    document.receiveOperation(operation);
+
+                    clientDocumentService.receiveOperation(operation);
                     try {
-                        CataloguePane.getInstance().updateTree(document.getText());
+                        // update the catalog tree
+                        CataloguePane.getInstance().updateTree(clientDocumentService.getText());
                     } catch (Exception e) {
                         System.out.println("error here1");
                         e.printStackTrace();
                     }
                 } else if (object instanceof String) {
                     String text = (String) object;
-                    document.setText(Text.wrap(text));
+                    clientDocumentService.setText(Text.wrap(text));
                     try {
-                        CataloguePane.getInstance().updateTree(document.getText());
+                        CataloguePane.getInstance().updateTree(clientDocumentService.getText());
                     } catch (Exception e) {
                         System.out.println("error here2");
                         e.printStackTrace();

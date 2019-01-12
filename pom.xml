@@ -20,6 +20,7 @@
         </plugins>
     </build>
     <dependencies>
+        <!--几种开源的markdown2html的实现方案-->
         <dependency>
             <groupId>com.atlassian.commonmark</groupId>
             <artifactId>commonmark</artifactId>
@@ -58,5 +59,14 @@
             <version>2.6</version>
         </dependency>
     </dependencies>
+    <!--国内镜像-->
+    <repositories>
+        <repository>
+            <id>163maven</id>
+            <name>163 maven</name>
+            <url>https://maven.aliyun.com/repository/central</url>
+            <!--<url>http://mirrors.163.com/maven/repository/maven-public/</url>-->
+        </repository>
+    </repositories>
 
 </project>

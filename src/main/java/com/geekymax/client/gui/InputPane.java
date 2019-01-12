@@ -51,6 +51,7 @@ public final class InputPane extends Observable {
      * Creates the text area and add a key listener to call observer every time a key is released.
      */
     private InputPane() {
+        // 新建一个可重入锁
         sendThreadReentrantlock = new ReentrantLock();
         sendThreadCondition = sendThreadReentrantlock.newCondition();
         scrollPane.getViewport().add(inputTextArea, null);
@@ -59,12 +60,13 @@ public final class InputPane extends Observable {
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
         try {
             Socket socket = new Socket("127.0.0.1", 9999);
+            // 新建send线程,传入锁
             sendThread = new SendThread(socket, sendThreadReentrantlock, sendThreadCondition);
             receiveThread = new ReceiveThread(socket);
-            ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(2, 4, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(2), threadFactory);
+            // 使用线程池管理线程
+            ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(2, 4, 10, TimeUnit.SECONDS, new ArrayBlockingQueue<>(2), threadFactory);
             threadPoolExecutor.execute(sendThread);
             threadPoolExecutor.execute(receiveThread);
-            ;
         } catch (Exception e) {
             e.printStackTrace();
         }

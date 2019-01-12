@@ -7,8 +7,6 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.util.Observable;
 
 /**
@@ -40,6 +38,8 @@ public final class MenuBar extends Observable {
      * Creates the file menu.
      * <p>
      * The file menu contains an "Exit" item, to quit the application.
+     * The file menu contains an "open" item, to open the local md.
+     * The file menu contains an "output" item, to output this document in html or md.
      * </p>
      *
      * @return the newly created file menu.
@@ -48,7 +48,7 @@ public final class MenuBar extends Observable {
         JMenu fileMenu = new JMenu("File");
         fileMenu.setMnemonic('F');
         // todo 打开本地文件功能
-        JMenuItem open = new JMenuItem();
+        JMenuItem open = new JMenuItem("open");
         open.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
